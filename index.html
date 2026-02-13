@@ -249,6 +249,17 @@
             return url;
         }
 
+        function getDriveLink(url) {
+            if (!url) return '';
+            if (url.includes('drive.google.com')) {
+                const match = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^\&]+)/);
+                if (match && match[1]) {
+                    return `https://drive.google.com/file/d/${match[1]}/view`;
+                }
+            }
+            return url;
+        }
+
         function processCSV(csvText) {
             const rawLines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
             const rows = rawLines.slice(1);
@@ -297,9 +308,12 @@
 
         function renderItem(cell, item) {
             const processedImg = formatDriveLink(item.imgUrl);
+            const driveLink = getDriveLink(item.imgUrl);
             cell.innerHTML = `
                 <div class="card-image-container">
-                    <img src="${processedImg}" class="card-image" crossorigin="anonymous" onerror="this.outerHTML='<div class=placeholder-img>Awaiting Visual</div>'">
+                    <a href="${driveLink}" target="_blank" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                        <img src="${processedImg}" class="card-image" style="cursor: pointer;" crossorigin="anonymous" onerror="this.outerHTML='<div class=placeholder-img>Awaiting Visual</div>'" data-drive-link="${driveLink}">
+                    </a>
                 </div>
                 <div class="card-content">
                     <div>
